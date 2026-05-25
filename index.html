@@ -49,3 +49,14 @@
     <div id="tortenet"></div>
     <div id="harc-log"></div>
     <div id="valasztasok"></div>
+
+    <script>
+        function dob(kockakSzama) {
+            let eredmeny = 0;
+            for (let i = 0; i < kockakSzama; i++) eredmeny += Math.floor(Math.random() * 6) + 1;
+            return eredmeny;
+        }
+
+        let karakter = {};
+        let jelenlegiEllenseg = null;
+    </script>
