@@ -32,3 +32,20 @@
         button.harc-gomb { background-color: #8b0000; text-align: center; }
         button.harc-gomb:hover { background-color: #a00000; }
     </style>
+
+    <div id="kalandlap">
+        <div class="stat-box">Ügyesség: <br><span id="ugyesseg" class="ertek"></span> / <span id="max_ugyesseg"></span></div>
+        <div class="stat-box">Életerő: <br><span id="eletero" class="ertek"></span> / <span id="max_eletero"></span></div>
+        <div class="stat-box">Szerencse: <br><span id="szerencse" class="ertek"></span> / <span id="max_szerencse"></span></div>
+        <div class="stat-box">Arany: <br><span id="arany" class="ertek"></span></div>
+        <div class="stat-box">Felszerelés: <br><span id="felszereles" style="font-weight: normal; font-size: 0.9em;"></span></div>
+    </div>
+
+    <div id="akciok">
+        <button id="gomb-elelem" class="akcio-gomb" onclick="eves()">Élelem evése (Van: <span id="elelem-db"></span>)</button>
+        <button id="gomb-ital" class="akcio-gomb" onclick="ivas()">Varázsital ivása (Van: <span id="ital-db"></span>)</button>
+    </div>
+
+    <div id="tortenet"></div>
+    <div id="harc-log"></div>
+    <div id="valasztasok"></div>
