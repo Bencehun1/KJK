@@ -4,13 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>A Tűzhegy Varázslója</title>
-</head>
-<body>
-    <h1>A Tűzhegy Varázslója</h1>
-</body>
-</html>
-
-<style>
+    <style>
         body { font-family: 'Georgia', serif; background-color: #f4f1ea; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; line-height: 1.6; }
         h1 { text-align: center; border-bottom: 2px solid #555; padding-bottom: 10px; font-variant: small-caps; }
         
@@ -32,6 +26,10 @@
         button.harc-gomb { background-color: #8b0000; text-align: center; }
         button.harc-gomb:hover { background-color: #a00000; }
     </style>
+</head>
+<body>
+
+    <h1>A Tűzhegy Varázslója</h1>
 
     <div id="kalandlap">
         <div class="stat-box">Ügyesség: <br><span id="ugyesseg" class="ertek"></span> / <span id="max_ugyesseg"></span></div>
@@ -59,4 +57,212 @@
 
         let karakter = {};
         let jelenlegiEllenseg = null;
+
+        function initJatek(italTipus) {
+            karakter = {
+                max_ugyesseg: dob(1) + 6,
+                max_eletero: dob(2) + 12,
+                max_szerencse: dob(1) + 6,
+                arany: 0,
+                elelem: 10,
+                italTipus: italTipus,
+                italAdag: 2,
+                felszereles: ["Kard", "Bőrpáncél", "Lámpás"]
+            };
+            
+            karakter.ugyesseg = karakter.max_ugyesseg;
+            karakter.eletero = karakter.max_eletero;
+            karakter.szerencse = karakter.max_szerencse;
+
+            if(italTipus === "szerencse") {
+                karakter.max_szerencse += 1;
+                karakter.szerencse = karakter.max_szerencse;
+            }
+
+            frissitUI();
+            lapozz(1);
+        }
+
+        const konyv = {
+            1: {
+                szoveg: "Már ott állsz a Tűzhegy sötét barlangbejáratánál. Nyálkás falakat pillantasz meg, a levegő hűvös és nyirkos. Meggyújtod a lámpásodat, és óvatosan bemerészkedsz a sötétségbe. Egy elágazáshoz érsz.",
+                lehetosegek: [
+                    { szoveg: "Nyugat felé indulsz (71-es pont).", cel: 71 },
+                    { szoveg: "Kelet felé haladsz (278-as pont).", cel: 278 }
+                ]
+            },
+            71: {
+                szoveg: "Nyugat felé indulsz. A folyosó egyre szűkebb lesz. Egy éles kanyar után egy barlangi Orkkal találod szembe magad! Nincs visszaút, harcolnod kell!",
+                harc: { nev: "Ork", ugyesseg: 6, eletero: 5, gyozelem_cel: 100 }
+            },
+            278: {
+                szoveg: "Kelet felé haladsz. Egy zárt ajtóhoz érsz. Ki akarod próbálni a szerencsédet, hogy nyitva van-e?",
+                szerencse_proba: { 
+                    siker_cel: 200, siker_szoveg: "Szerencséd van! Az ajtó enged.",
+                    kudarc_cel: 201, kudarc_szoveg: "Balszerencse! Az ajtó zárva, és zajt csaptál."
+                }
+            },
+            100: {
+                szoveg: "Legyőzted az Orkot! A földön találsz egy Rézkulcsot és 2 Aranyat.",
+                targy: "Rézkulcs", arany: 2,
+                lehetosegek: [ { szoveg: "Mész tovább keletre (278-as pont).", cel: 278 } ]
+            },
+            200: {
+                szoveg: "Belépsz a szobába. Kincseket találsz! (Itt a demó vége)",
+                lehetosegek: []
+            },
+            201: {
+                szoveg: "A zajra egy hatalmas Sárkány ébred fel, aki azonnal tüzet okád rád. (Itt a demó vége)",
+                lehetosegek: []
+            }
+        };
+
+        function frissitUI() {
+            document.getElementById('ugyesseg').innerText = karakter.ugyesseg;
+            document.getElementById('max_ugyesseg').innerText = karakter.max_ugyesseg;
+            document.getElementById('eletero').innerText = karakter.eletero;
+            document.getElementById('max_eletero').innerText = karakter.max_eletero;
+            document.getElementById('szerencse').innerText = karakter.szerencse;
+            document.getElementById('max_szerencse').innerText = karakter.max_szerencse;
+            document.getElementById('arany').innerText = karakter.arany;
+            document.getElementById('felszereles').innerText = karakter.felszereles.join(', ');
+            
+            document.getElementById('elelem-db').innerText = karakter.elelem;
+            document.getElementById('gomb-elelem').disabled = (karakter.elelem <= 0 || karakter.eletero === karakter.max_eletero);
+            
+            document.getElementById('ital-db').innerText = karakter.italAdag;
+            document.getElementById('gomb-ital').disabled = (karakter.italAdag <= 0);
+        }
+
+        function eves() {
+            if (karakter.elelem > 0 && karakter.eletero < karakter.max_eletero) {
+                karakter.elelem--;
+                karakter.eletero = Math.min(karakter.max_eletero, karakter.eletero + 4);
+                frissitUI();
+            }
+        }
+
+        function ivas() {
+            if (karakter.italAdag > 0) {
+                karakter.italAdag--;
+                if (karakter.italTipus === "ugyesseg") karakter.ugyesseg = karakter.max_ugyesseg;
+                if (karakter.italTipus === "eletero") karakter.eletero = karakter.max_eletero;
+                if (karakter.italTipus === "szerencse") {
+                    karakter.max_szerencse++;
+                    karakter.szerencse = karakter.max_szerencse;
+                }
+                frissitUI();
+            }
+        }
+
+        function lapozz(pontszam) {
+            const pont = konyv[pontszam];
+            document.getElementById('harc-log').innerText = '';
+            
+            if(pont.targy && !karakter.felszereles.includes(pont.targy)) karakter.felszereles.push(pont.targy);
+            if(pont.arany) { karakter.arany += pont.arany; pont.arany = 0; }
+            
+            frissitUI();
+
+            document.getElementById('tortenet').innerText = pont.szoveg;
+            const valasztasokDiv = document.getElementById('valasztasok');
+            valasztasokDiv.innerHTML = '';
+
+            if (pont.harc) {
+                jelenlegiEllenseg = { ...pont.harc };
+                let harcLog = `${jelenlegiEllenseg.nev} (ÜGY: ${jelenlegiEllenseg.ugyesseg}, ÉLE: ${jelenlegiEllenseg.eletero})`;
+                document.getElementById('harc-log').innerText = harcLog;
+
+                const gomb = document.createElement('button');
+                gomb.className = 'lehetoseg harc-gomb';
+                gomb.innerText = "⚔️ Támadás!";
+                gomb.onclick = () => harciKor(pont.harc.gyozelem_cel);
+                valasztasokDiv.appendChild(gomb);
+                return;
+            }
+
+            if (pont.szerencse_proba) {
+                const gomb = document.createElement('button');
+                gomb.className = 'lehetoseg';
+                gomb.innerText = "🍀 Tégy próbát a szerencséddel!";
+                gomb.onclick = () => szerencseProbaDobas(pont.szerencse_proba);
+                valasztasokDiv.appendChild(gomb);
+                return;
+            }
+
+            if (pont.lehetosegek && pont.lehetosegek.length > 0) {
+                pont.lehetosegek.forEach(leh => {
+                    const gomb = document.createElement('button');
+                    gomb.className = 'lehetoseg';
+                    gomb.innerText = leh.szoveg;
+                    gomb.onclick = () => lapozz(leh.cel);
+                    valasztasokDiv.appendChild(gomb);
+                });
+            } else {
+                const gomb = document.createElement('button');
+                gomb.className = 'lehetoseg';
+                gomb.innerText = "Új játék kezdése";
+                gomb.onclick = () => location.reload();
+                valasztasokDiv.appendChild(gomb);
+            }
+        }
+
+        function harciKor(gyozelemCel) {
+            let log = document.getElementById('harc-log');
+            
+            let hosTámadoero = karakter.ugyesseg + dob(2);
+            let szornyTámadoero = jelenlegiEllenseg.ugyesseg + dob(2);
+
+            let eredmenySzoveg = `Te támadóerőd: ${hosTámadoero} vs ${jelenlegiEllenseg.nev} támadóereje: ${szornyTámadoero}\n`;
+
+            if (hosTámadoero > szornyTámadoero) {
+                jelenlegiEllenseg.eletero -= 2;
+                eredmenySzoveg += `👉 Megsebezted a szörnyet! (-2 Életerő)\n`;
+            } else if (szornyTámadoero > hosTámadoero) {
+                karakter.eletero -= 2;
+                eredmenySzoveg += `🩸 A szörny megsebzett téged! (-2 Életerő)\n`;
+            } else {
+                eredmenySzoveg += `⚔️ Kivédtétek egymás ütését!\n`;
+            }
+
+            eredmenySzoveg += `Ellenség Életereje: ${jelenlegiEllenseg.eletero} | Te Életerőd: ${karakter.eletero}\n\n`;
+            log.innerText = eredmenySzoveg + log.innerText;
+            frissitUI();
+
+            if (karakter.eletero <= 0) {
+                alert("Meghaltál a harcban! Vége a játéknak.");
+                location.reload();
+            } else if (jelenlegiEllenseg.eletero <= 0) {
+                document.getElementById('valasztasok').innerHTML = '';
+                const gomb = document.createElement('button');
+                gomb.className = 'lehetoseg';
+                gomb.innerText = "Győzelem! Továbbhaladás...";
+                gomb.onclick = () => lapozz(gyozelemCel);
+                document.getElementById('valasztasok').appendChild(gomb);
+            }
+        }
+
+        function szerencseProbaDobas(proba) {
+            let dobas = dob(2);
+            let jelenlegiSzerencse = karakter.szerencse;
+            karakter.szerencse--;
+            frissitUI();
+
+            let log = document.getElementById('harc-log');
+            if (dobas <= jelenlegiSzerencse) {
+                log.innerText = `Kockadobás: ${dobas} <= Szerencséd (${jelenlegiSzerencse}). SIKER!\n`;
+                setTimeout(() => lapozz(proba.siker_cel), 2000);
+            } else {
+                log.innerText = `Kockadobás: ${dobas} > Szerencséd (${jelenlegiSzerencse}). KUDARC!\n`;
+                setTimeout(() => lapozz(proba.kudarc_cel), 2000);
+            }
+            document.getElementById('valasztasok').innerHTML = '';
+        }
+
+        let valasztottItal = prompt("Milyen italt viszel magaddal?\nÍrd be: 'ugyesseg', 'eletero' vagy 'szerencse'", "eletero");
+        if(!["ugyesseg", "eletero", "szerencse"].includes(valasztottItal)) valasztottItal = "eletero";
+        initJatek(valasztottItal);
+
     </script>
+</body>
+</html>
