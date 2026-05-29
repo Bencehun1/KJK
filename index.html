@@ -9,3 +9,26 @@
     <h1>A Tűzhegy Varázslója</h1>
 </body>
 </html>
+
+<style>
+        body { font-family: 'Georgia', serif; background-color: #f4f1ea; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; line-height: 1.6; }
+        h1 { text-align: center; border-bottom: 2px solid #555; padding-bottom: 10px; font-variant: small-caps; }
+        
+        #kalandlap { display: flex; flex-wrap: wrap; gap: 15px; background-color: #e3ddc8; padding: 15px; border-radius: 8px; font-weight: bold; margin-bottom: 20px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }
+        .stat-box { flex: 1; min-width: 120px; text-align: center; border-right: 1px solid #ccc; }
+        .stat-box:last-child { border-right: none; }
+        .ertek { color: #8b0000; font-size: 1.2em; }
+        
+        #akciok { display: flex; gap: 10px; margin-bottom: 20px; }
+        .akcio-gomb { background-color: #4CAF50; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; flex: 1; }
+        .akcio-gomb:disabled { background-color: #aaa; cursor: not-allowed; }
+        
+        #tortenet { font-size: 1.2em; margin-bottom: 20px; min-height: 100px; background: white; padding: 20px; border-radius: 8px; border: 1px solid #ccc; }
+        #harc-log { color: #8b0000; font-style: italic; margin-bottom: 20px; white-space: pre-line; }
+        
+        #valasztasok { display: flex; flex-direction: column; gap: 10px; }
+        button.lehetoseg { padding: 15px; font-size: 1.1em; cursor: pointer; background-color: #3a3a3a; color: white; border: 2px solid #222; border-radius: 8px; text-align: left; transition: 0.2s; }
+        button.lehetoseg:hover { background-color: #555; transform: translateX(5px); }
+        button.harc-gomb { background-color: #8b0000; text-align: center; }
+        button.harc-gomb:hover { background-color: #a00000; }
+    </style>
